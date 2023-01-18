@@ -1,5 +1,6 @@
 import {
   Excalidraw,
+  exportToBlob,
   MainMenu,
   MIME_TYPES,
   Sidebar,
@@ -56,8 +57,21 @@ function App() {
     fetchData();
   }, [excalidrawAPI]);
 
-  const renderTopRightUI = () => {
-    return <></>;
+  // const handleUploadChange = (event) => {
+  //   console.log("FILE", event.target.files[0]);
+  //   const file = event.target.files[0];
+  //   const scene = loadFromBlob(file, null, null);
+  //   excalidrawAPI.updateScene(scene);
+
+  //   // convertPdfToImage(file);
+  // };
+
+  const renderTopRightUI = (isMobile) => {
+    return (
+      <>
+        {/* <input type="file" onChange={handleUploadChange} name="file" /> */}
+      </>
+    );
   };
 
   const onLinkOpen = useCallback((element, event) => {
@@ -96,9 +110,26 @@ function App() {
     );
   };
 
+  const handleDownload = async () => {
+    const blob = await exportToBlob({
+      elements: excalidrawAPI?.getSceneElements(),
+      mimeType: "image/png",
+      appState: {
+        ...initialData.appState,
+      },
+      files: excalidrawAPI?.getFiles(),
+    });
+    let blobUrl = window.URL.createObjectURL(blob);
+    let a = document.createElement("a");
+    a.download = "download" + new Date().getTime();
+    a.href = blobUrl;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  };
+
   return (
     <div className="App" ref={appRef}>
-      <button></button>
       <div className="excalidraw-wrapper">
         <Excalidraw
           ref={(api) => setExcalidrawAPI(api)}
@@ -108,7 +139,9 @@ function App() {
           gridModeEnabled={false}
           theme={"light"}
           name="Custom name of drawing"
-          UIOptions={{ canvasActions: { loadScene: false } }}
+          UIOptions={{
+            canvasActions: { loadScene: false },
+          }}
           renderTopRightUI={renderTopRightUI}
           onLinkOpen={onLinkOpen}
           renderSidebar={renderSidebar}
@@ -116,6 +149,7 @@ function App() {
           {renderMenu()}
         </Excalidraw>
       </div>
+      <button onClick={handleDownload}>Download</button>
     </div>
   );
 }
