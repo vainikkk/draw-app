@@ -11,3 +11,11 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.excalidraw .welcome-screen-center__logo {
+  display: none !important;
+}
+
+#root{
+  height: 100vh
+}
